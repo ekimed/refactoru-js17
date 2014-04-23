@@ -1,51 +1,51 @@
 // create all required objects for restaurant
-var Fooditem = function(name, calories, vegan, glutenFree, citrusFree) {
+var Ingredient = function(name, calories, vegan, glutenFree, citrusFree) {
     this.name = name;
     this.calories = calories;
     this.vegan = vegan;
     this.glutenFree = glutenFree;
     this.citrusFree = citrusFree
 };
-Fooditem.prototype.toString = function() {
+Ingredient.prototype.toString = function() {
     return "Name: " + this.name + " Calories: " + this.calories + " Is Vegan: " + this.vegan + " Is Gluten Free: " + this.glutenFree + " Is Citrus Free: " + this.citrusFree;
 };
 
-Fooditem.prototype.createDomElement = function() {
+Ingredient.prototype.createDomElement = function() {
 
     return $('<div class="food-item">' + this.name + ": " + this.calories + ' cals</div>');
 }
 
-// var EdibleCombinations = (function() {
+// var Recipe = (function() {
 
-function EdibleCombinations(name, description, price, ingredients) {
+function Recipe(name, description, price, ingredients) {
     this.name = name;
     this.description = description;
     this.price = price;
     this.ingredients = ingredients;
 };
-EdibleCombinations.prototype.toString = function() {
+Recipe.prototype.toString = function() {
     return "Name: " + this.name + " Description: " + this.description + " Price: " + this.price + " Ingredients: " + this.ingredients.map(function(z) {
         return z.name;
     });
 }
-EdibleCombinations.prototype.isVegan = function() {
+Recipe.prototype.isVegan = function() {
     return this.ingredients.every(function(z) {
         return z.vegan;
     })
 }
-EdibleCombinations.prototype.isGlutenFree = function() {
+Recipe.prototype.isGlutenFree = function() {
     return this.ingredients.every(function(z) {
         return z.glutenFree;
     })
 }
-EdibleCombinations.prototype.isCitrusFree = function() {
+Recipe.prototype.isCitrusFree = function() {
     return this.ingredients.every(function(z) {
         return z.citrusFree;
     })
 }
 
-EdibleCombinations.prototype.createDomElement = function() {
-    var itemContainer = $('<div class="menu-item"></div>');
+Recipe.prototype.createDomElement = function() {
+    var itemContainer = $('<div class="menu-item" data-recipe="' + this.name + '"></div>');
     var plate = $('<div class="plate">' + this.name + '</div>');
     var price = $('<div class="price">' + this.price + '</div>');
     var addBtn = $('<button class="add-btn">Add</button>')
@@ -64,48 +64,48 @@ EdibleCombinations.prototype.createDomElement = function() {
 
     return itemContainer;
 };
-//     return EdibleCombinations;
+//     return Recipe;
 // })();
 
 
 var Drink = function(name, description, price, ingredients) {
-    EdibleCombinations.call(this, name, description, price, ingredients);
+    Recipe.call(this, name, description, price, ingredients);
 }
-Drink.prototype = new EdibleCombinations();
+Drink.prototype = new Recipe();
 
 var Plate = function(name, description, price, ingredients) {
-    EdibleCombinations.call(this, name, description, price, ingredients);
+    Recipe.call(this, name, description, price, ingredients);
 };
-Plate.prototype = new EdibleCombinations();
+Plate.prototype = new Recipe();
 
 
-var ListsOfEdibles = function(edibles, $target) {
-    this.edibles = edibles;
+var MenuList = function($target) {
+    this.recipeS = [];
     this.$target = $target;
 }
-ListsOfEdibles.prototype.toString = function() {
-    return this.edibles.join(', ');
+MenuList.prototype.toString = function() {
+    return this.recipeS.join(', ');
 }
-ListsOfEdibles.prototype.renderEdibles = function() {
+MenuList.prototype.renderRecipeS = function() {
     this.$target.empty();
-    for (var i = 0; i < this.edibles.length; i++) {
-        this.$target.append(this.edibles[i].createDomElement());
+    for (var i = 0; i < this.recipeS.length; i++) {
+        this.$target.append(this.recipeS[i].createDomElement());
     }
 }
-ListsOfEdibles.prototype.addEdible = function(edible) {
-    this.edibles.unshift(edible);
-    this.renderEdibles();
+MenuList.prototype.addEdible = function(recipe) {
+    this.recipeS.unshift(recipe);
+    this.renderRecipeS();
 }
 
-var Order = function(edibles, $target) {
-    ListsOfEdibles.call(this, edibles, $target);
+var Order = function($target) {
+    MenuList.call(this, $target);
 };
-Order.prototype = new ListsOfEdibles();
+Order.prototype = new MenuList();
 
-var Menu = function(edibles, $target) {
-    ListsOfEdibles.call(this, edibles, $target);
+var Menu = function($target) {
+    MenuList.call(this, $target);
 };
-Menu.prototype = new ListsOfEdibles();
+Menu.prototype = new MenuList();
 
 var Restaurant = function(name, description, menu) {
     this.name = name;
@@ -129,13 +129,13 @@ Customer.prototype.toString = function() {
 //instantiate all variables
 
 //ingredients
-var cornChips = new Fooditem('Corn Chips', 200, false, true, false);
-var groundBeef = new Fooditem('Ground Beef', 500, false, true, true);
-var tomato = new Fooditem("tomato", 25, true, true, true);
-var avacados = new Fooditem("avacados", 55, true, true, true);
-var wheatTortilla = new Fooditem("tortilla", 425, false, false, true);
-var tequilla = new Fooditem("tequilla", 25, true, true, true);
-var limeJuice = new Fooditem("tequilla", 25, true, true, false);
+var cornChips = new Ingredient('Corn Chips', 200, false, true, false);
+var groundBeef = new Ingredient('Ground Beef', 500, false, true, true);
+var tomato = new Ingredient("Tomato", 25, true, true, true);
+var avacados = new Ingredient("Avacados", 55, true, true, true);
+var wheatTortilla = new Ingredient("Tortilla", 425, false, false, true);
+var tequilla = new Ingredient("Tequilla", 55, true, true, true);
+var limeJuice = new Ingredient("Limes", 25, true, true, false);
 
 //plates
 var burritoPlate = new Plate('Burrito Plate', 'plain burrito', 8, [groundBeef, tomato, avacados, wheatTortilla]);
@@ -144,19 +144,38 @@ var margaritaDrink = new Drink('Simple Marg', 'booze', 4, [tequilla, limeJuice])
 
 //menu
 var mainMenu = $('.menu');
-var theMenu = new Menu([burritoPlate, guacamolePlate, margaritaDrink], mainMenu);
+var theMenu = new Menu(mainMenu);
+theMenu.addEdible(burritoPlate);
+theMenu.addEdible(guacamolePlate);
+theMenu.addEdible(margaritaDrink);
+
+//order
+var mainOrder = $('.order');
+var theOrder = new Order(mainOrder, []);
 
 //restaurant
 var theRestaurant = new Restaurant('Refactoru Cafe', 'Cheap brain food', theMenu);
 
+var returnRecipeObject = function(menuList, recipeName) {
+    return menuList.recipeS.filter(function(recipe) {
+        return recipe.name === recipeName;
+    })[0];
+}
+
+var findRecipeName = function($addBtn) {
+    console.log($addBtn);
+    return $addBtn.closest('.menu-item').attr('data-recipe');
+}
 
 // on load populate menu
 $(document).on('ready', function() {
 
-    theMenu.renderEdibles();
+    theMenu.renderRecipeS();
 
     $(document).on('click', '.add-btn', function() {
-
+        var obj1 = returnRecipeObject(theMenu, findRecipeName($(this)));
+        console.log(obj1);
+        theOrder.addEdible(obj1);
     })
 
 });
