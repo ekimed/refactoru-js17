@@ -44,11 +44,12 @@ Recipe.prototype.isCitrusFree = function() {
     })
 }
 
-Recipe.prototype.createDomElement = function() {
+Recipe.prototype.createDomElement = function(buttonType) {
     var itemContainer = $('<div class="menu-item" data-recipe="' + this.name + '"></div>');
     var plate = $('<div class="plate">' + this.name + '</div>');
     var price = $('<div class="price">' + this.price + '</div>');
-    var addBtn = $('<button class="add-btn">Add</button>')
+
+    var addBtn = this.createButton(buttonType);
 
     var ingredientContainer = $('<div class="ing-cont"></div>');
 
@@ -64,10 +65,18 @@ Recipe.prototype.createDomElement = function() {
 
     return itemContainer;
 };
+Recipe.prototype.createButton = function(buttonType) {
+    if (buttonType === "add") {
+        var button = $('<button class="add-btn">Add</button>')
+    } else {
+        var button = $('<button class="remove-btn">Remove</button>')
+    }
+    return button;
+}
 //     return Recipe;
 // })();
 
-
+//specific recipes drink/plate
 var Drink = function(name, description, price, ingredients) {
     Recipe.call(this, name, description, price, ingredients);
 }
@@ -79,6 +88,9 @@ var Plate = function(name, description, price, ingredients) {
 Plate.prototype = new Recipe();
 
 
+
+//menu's / orders
+
 var MenuList = function($target) {
     this.recipeS = [];
     this.$target = $target;
@@ -89,7 +101,7 @@ MenuList.prototype.toString = function() {
 MenuList.prototype.renderRecipeS = function() {
     this.$target.empty();
     for (var i = 0; i < this.recipeS.length; i++) {
-        this.$target.append(this.recipeS[i].createDomElement());
+        this.$target.append(this.recipeS[i].createDomElement(this.$target.attr('data-form')));
     }
 }
 MenuList.prototype.addEdible = function(recipe) {
@@ -176,6 +188,9 @@ $(document).on('ready', function() {
         var obj1 = returnRecipeObject(theMenu, findRecipeName($(this)));
         console.log(obj1);
         theOrder.addEdible(obj1);
+    })
+    $(document).on('click', '.remove-btn', function() {
+
     })
 
 });
