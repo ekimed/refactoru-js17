@@ -108,6 +108,12 @@ MenuList.prototype.addEdible = function(recipe) {
     this.recipeS.unshift(recipe);
     this.renderRecipeS();
 }
+MenuList.prototype.isSomething = function(whatIsChecked) {
+    console.log(whatIsChecked);
+    for (var i = 0; i < this.recipeS.length; i++) {
+        console.log(this.recipeS[i]['is' + whatIsChecked]());
+    };
+}
 
 var Order = function($target) {
     MenuList.call(this, $target);
@@ -193,10 +199,16 @@ $(document).on('ready', function() {
         var obj2 = returnRecipeObject(theOrder, findRecipeName($(this)));
         var index = theOrder.recipeS.indexOf(obj2)
         theOrder.recipeS.splice(index, 1);
-        $(this).parent().closest('.menu-item').remove();
+        theOrder.renderRecipeS();
     })
 
-    $(document).on('click', '[name=
-        "diet-preference"]')
+    $(document).on('change', '[name="diet-preference"]', function() {
+        console.log('clicked!', $(this).attr('value'));
+
+        theMenu.isSomething($(this).attr('value'));
+
+
+
+    });
 
 });
