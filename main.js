@@ -196,4 +196,7 @@ $(document).on('ready', function() {
         $(this).parent().closest('.menu-item').remove();
     })
 
+    $(document).on('click', '[name=
+        "diet-preference"]')
+
 });
