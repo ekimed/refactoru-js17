@@ -190,7 +190,10 @@ $(document).on('ready', function() {
         theOrder.addEdible(obj1);
     })
     $(document).on('click', '.remove-btn', function() {
-
+        var obj2 = returnRecipeObject(theOrder, findRecipeName($(this)));
+        var index = theOrder.recipeS.indexOf(obj2)
+        theOrder.recipeS.splice(index, 1);
+        $(this).parent().closest('.menu-item').remove();
     })
 
 });
