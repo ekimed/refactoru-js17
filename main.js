@@ -22,6 +22,7 @@ function Recipe(name, description, price, ingredients) {
     this.description = description;
     this.price = price;
     this.ingredients = ingredients;
+    this.is = false;
 };
 Recipe.prototype.toString = function() {
     return "Name: " + this.name + " Description: " + this.description + " Price: " + this.price + " Ingredients: " + this.ingredients.map(function(z) {
@@ -63,6 +64,10 @@ Recipe.prototype.createDomElement = function(buttonType) {
 
     itemContainer.append(ingredientContainer, priceContainer);
 
+    if (this.is) {
+        itemContainer.addClass('menu-is');
+    };
+
     return itemContainer;
 };
 Recipe.prototype.createButton = function(buttonType) {
@@ -72,6 +77,17 @@ Recipe.prototype.createButton = function(buttonType) {
         var button = $('<button class="remove-btn">Remove</button>')
     }
     return button;
+}
+Recipe.prototype.isSomething = function(whatIsChecked) {
+
+    console.log(this.name + "whatIsChecked" + ":", whatIsChecked);
+    if ((whatIsChecked.GlutenFree || whatIsChecked.Vegan || whatIsChecked.CitrusFree) === false) {
+        this.is = false;
+    } else {
+        var isIt = (whatIsChecked.GlutenFree ? this.isGlutenFree() : true) && (whatIsChecked.CitrusFree ? this.isCitrusFree() : true) && (whatIsChecked.Vegan ? this.isVegan() : true);
+        console.log(this.name + " is:", isIt);
+        this.is = isIt;
+    }
 }
 //     return Recipe;
 // })();
@@ -108,11 +124,16 @@ MenuList.prototype.addEdible = function(recipe) {
     this.recipeS.unshift(recipe);
     this.renderRecipeS();
 }
-MenuList.prototype.isSomething = function(whatIsChecked) {
-    console.log(whatIsChecked);
+MenuList.prototype.removeEdible = function(recipe) {
+    var index = this.recipeS.indexOf(recipe)
+    this.recipeS.splice(index, 1);
+    this.renderRecipeS();
+}
+MenuList.prototype.isCheck = function(whatIsChecked) {
     for (var i = 0; i < this.recipeS.length; i++) {
-        console.log(this.recipeS[i]['is' + whatIsChecked]());
+        this.recipeS[i].isSomething(whatIsChecked);
     };
+    this.renderRecipeS();
 }
 
 var Order = function($target) {
@@ -157,7 +178,8 @@ var limeJuice = new Ingredient("Limes", 25, true, true, false);
 
 //plates
 var burritoPlate = new Plate('Burrito Plate', 'plain burrito', 8, [groundBeef, tomato, avacados, wheatTortilla]);
-var guacamolePlate = new Plate('Guacamole Plate', 'green goo', 12, [avacados, tomato, limeJuice, cornChips]);
+var guacamolePlate = new Plate('Guacamole Plate', 'green goo', 12, [avacados, tomato]);
+var cornChipPlate = new Plate('Corn Chips', 'delish chippies', 4, [limeJuice, cornChips]);
 var margaritaDrink = new Drink('Simple Marg', 'booze', 4, [tequilla, limeJuice]);
 
 //menu
@@ -166,6 +188,7 @@ var theMenu = new Menu(mainMenu);
 theMenu.addEdible(burritoPlate);
 theMenu.addEdible(guacamolePlate);
 theMenu.addEdible(margaritaDrink);
+theMenu.addEdible(cornChipPlate);
 
 //order
 var mainOrder = $('.order');
@@ -181,7 +204,6 @@ var returnRecipeObject = function(menuList, recipeName) {
 }
 
 var findRecipeName = function($addBtn) {
-    console.log($addBtn);
     return $addBtn.closest('.menu-item').attr('data-recipe');
 }
 
@@ -191,24 +213,23 @@ $(document).on('ready', function() {
     theMenu.renderRecipeS();
 
     $(document).on('click', '.add-btn', function() {
-        var obj1 = returnRecipeObject(theMenu, findRecipeName($(this)));
-        console.log(obj1);
-        theOrder.addEdible(obj1);
+        var recipeToAdd = returnRecipeObject(theMenu, findRecipeName($(this)));
+        theOrder.addEdible(recipeToAdd);
     })
     $(document).on('click', '.remove-btn', function() {
-        var obj2 = returnRecipeObject(theOrder, findRecipeName($(this)));
-        var index = theOrder.recipeS.indexOf(obj2)
-        theOrder.recipeS.splice(index, 1);
-        theOrder.renderRecipeS();
+        var recipeToRemove = returnRecipeObject(theOrder, findRecipeName($(this)));
+        theOrder.removeEdible(recipeToRemove);
+
     })
 
     $(document).on('change', '[name="diet-preference"]', function() {
-        console.log('clicked!', $(this).attr('value'));
+        var boxesChecked = {};
+        $(this).parent().children().each(function() {
+            $(this).prop('checked') ? boxesChecked[$(this).val()] = true : boxesChecked[$(this).val()] = false;
 
-        theMenu.isSomething($(this).attr('value'));
-
-
+        });
+        theMenu.isCheck(boxesChecked);
+        console.log(boxesChecked);
 
     });
-
 });
