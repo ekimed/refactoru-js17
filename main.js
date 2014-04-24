@@ -141,6 +141,29 @@ var Order = function($target) {
 };
 Order.prototype = new MenuList();
 
+Order.prototype.addTotal = function(){
+    var total=0
+    var text = $('.order').find('.price').each(function(){
+        var price = $(this).text();
+        total += +price;
+
+    });
+    $('.total-price').text(total);
+}
+
+Order.prototype.removeTotal = function(recipe){
+    var currentTotal = +$('.total-price').text();
+    var index = this.recipeS.indexOf(recipe);
+
+    var priceToRemove = this.recipeS[index].price;
+    var newTotal = currentTotal - priceToRemove;
+    $('.total-price').text(newTotal);
+
+    if (newTotal === 0){
+        $('.total-price').toggle();
+    }
+}
+
 var Menu = function($target) {
     MenuList.call(this, $target);
 };
@@ -215,9 +238,11 @@ $(document).on('ready', function() {
     $(document).on('click', '.add-btn', function() {
         var recipeToAdd = returnRecipeObject(theMenu, findRecipeName($(this)));
         theOrder.addEdible(recipeToAdd);
+        theOrder.addTotal();
     })
     $(document).on('click', '.remove-btn', function() {
         var recipeToRemove = returnRecipeObject(theOrder, findRecipeName($(this)));
+        theOrder.removeTotal(recipeToRemove);
         theOrder.removeEdible(recipeToRemove);
 
     })
