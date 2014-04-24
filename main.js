@@ -141,17 +141,21 @@ var Order = function($target) {
 };
 Order.prototype = new MenuList();
 
-Order.prototype.addTotal = function(){
-    var total=0
-    var text = $('.order').find('.price').each(function(){
+Order.prototype.addTotal = function() {
+    var total = 0
+    var text = $('.order').find('.price').each(function() {
         var price = $(this).text();
         total += +price;
 
     });
     $('.total-price').text(total);
+
+    if ($('.total-price').css("display") === 'none') {
+        $('.total-price').toggle();
+    }
 }
 
-Order.prototype.removeTotal = function(recipe){
+Order.prototype.removeTotal = function(recipe) {
     var currentTotal = +$('.total-price').text();
     var index = this.recipeS.indexOf(recipe);
 
@@ -159,7 +163,7 @@ Order.prototype.removeTotal = function(recipe){
     var newTotal = currentTotal - priceToRemove;
     $('.total-price').text(newTotal);
 
-    if (newTotal === 0){
+    if (newTotal === 0) {
         $('.total-price').toggle();
     }
 }
